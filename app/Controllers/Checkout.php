@@ -62,12 +62,20 @@ class Checkout extends BaseController
         }
 
         $validation = \Config\Services::validation();
-        $validation->setRules([
-            'customer_name'    => 'required|min_length[3]',
-            'customer_email'   => 'required|valid_email',
-            'customer_phone'   => 'required',
-            'shipping_address' => 'required|min_length[10]',
-        ]);
+        
+        // Different validation rules for logged-in vs guest users
+        if (session()->get('customer_logged_in')) {
+            $validation->setRules([
+                'shipping_address' => 'required|min_length[10]',
+            ]);
+        } else {
+            $validation->setRules([
+                'customer_name'    => 'required|min_length[3]',
+                'customer_email'   => 'required|valid_email',
+                'customer_phone'   => 'required',
+                'shipping_address' => 'required|min_length[10]',
+            ]);
+        }
 
         if (!$validation->withRequest($this->request)->run()) {
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
@@ -82,9 +90,32 @@ class Checkout extends BaseController
             }
         }
 
+        // Get customer ID if logged in, otherwise create/find guest customer
+        $customerId = session()->get('customer_id');
+        
+        if (!$customerId) {
+            // Create guest customer record
+            $customerModel = new \App\Models\CustomerModel();
+            $customerData = [
+                'name'     => $this->request->getPost('customer_name'),
+                'email'    => $this->request->getPost('customer_email'),
+                'phone'    => $this->request->getPost('customer_phone'),
+                'password' => password_hash(uniqid(), PASSWORD_DEFAULT), // Random password for guest
+                'address'  => $this->request->getPost('shipping_address'),
+            ];
+            
+            // Check if email exists
+            $existingCustomer = $customerModel->where('email', $customerData['email'])->first();
+            if ($existingCustomer) {
+                $customerId = $existingCustomer['id'];
+            } else {
+                $customerId = $customerModel->insert($customerData);
+            }
+        }
+
         // Create order
         $orderData = [
-            'customer_id'      => 1, // Default customer for demo
+            'customer_id'      => $customerId,
             'order_number'     => $this->orderModel->generateOrderNumber(),
             'total_amount'     => $total,
             'status'           => 'pending',

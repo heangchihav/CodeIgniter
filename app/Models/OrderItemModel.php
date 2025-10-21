@@ -36,7 +36,7 @@ class OrderItemModel extends Model
 
     public function getOrderItems($orderId)
     {
-        return $this->select('order_items.*, products.name as product_name, products.image')
+        return $this->select('order_items.*, products.name as product_name, products.image as product_image, products.slug as product_slug')
                     ->join('products', 'products.id = order_items.product_id')
                     ->where('order_items.order_id', $orderId)
                     ->findAll();

@@ -4,16 +4,19 @@ namespace App\Controllers;
 
 use App\Models\ProductModel;
 use App\Models\CategoryModel;
+use App\Models\ProductImageModel;
 
 class Shop extends BaseController
 {
     protected $productModel;
     protected $categoryModel;
+    protected $productImageModel;
 
     public function __construct()
     {
         $this->productModel = new ProductModel();
         $this->categoryModel = new CategoryModel();
+        $this->productImageModel = new ProductImageModel();
         helper(['form', 'url']);
     }
 
@@ -57,12 +60,14 @@ class Shop extends BaseController
 
         $category = $this->categoryModel->find($product['category_id']);
         $relatedProducts = $this->productModel->getByCategory($product['category_id']);
+        $productImages = $this->productImageModel->getProductImages($product['id']);
 
         $data = [
             'title'           => $product['name'],
             'product'         => $product,
             'category'        => $category,
             'relatedProducts' => array_slice($relatedProducts, 0, 4),
+            'product_images'  => $productImages,
         ];
 
         return view('shop/product_detail', $data);

@@ -57,4 +57,12 @@ class OrderModel extends Model
     {
         return 'ORD-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6));
     }
+
+    public function getOrdersWithCustomers()
+    {
+        return $this->select('orders.*, customers.name as customer_name, customers.email as customer_email')
+                    ->join('customers', 'customers.id = orders.customer_id')
+                    ->orderBy('orders.created_at', 'DESC')
+                    ->findAll();
+    }
 }

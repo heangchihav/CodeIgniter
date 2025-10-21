@@ -47,6 +47,37 @@
                         </span>
                         <?php endif; ?>
                     </a>
+
+                    <!-- User Account -->
+                    <?php if (session()->get('customer_logged_in')): ?>
+                        <div class="relative group">
+                            <button class="flex items-center text-gray-700 hover:text-indigo-600">
+                                <i class="fas fa-user-circle text-xl mr-1"></i>
+                                <span class="hidden md:inline"><?= esc(session()->get('customer_name')) ?></span>
+                                <i class="fas fa-chevron-down text-xs ml-1"></i>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block z-10">
+                                <a href="<?= base_url('/account') ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                                </a>
+                                <a href="<?= base_url('/account/orders') ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-shopping-bag mr-2"></i> My Orders
+                                </a>
+                                <a href="<?= base_url('/account/profile') ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-user mr-2"></i> Profile
+                                </a>
+                                <hr class="my-2">
+                                <a href="<?= base_url('/logout') ?>" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                </a>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <a href="<?= base_url('/login') ?>" class="text-gray-700 hover:text-indigo-600">
+                            <i class="fas fa-user text-xl"></i>
+                            <span class="hidden md:inline ml-1">Login</span>
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

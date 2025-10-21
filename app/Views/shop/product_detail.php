@@ -14,10 +14,46 @@
 
     <!-- Product Detail -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-        <!-- Product Image -->
+        <!-- Product Image Gallery -->
         <div>
+            <?php if (!empty($product_images)): ?>
+            <!-- Main Image Display -->
+            <div class="mb-4">
+                <img id="mainImage" src="<?= esc($product_images[0]['image_url']) ?>" alt="<?= esc($product['name']) ?>" 
+                     class="w-full rounded-lg shadow-lg object-cover" style="height: 500px;">
+            </div>
+
+            <!-- Thumbnail Gallery -->
+            <div class="grid grid-cols-4 gap-2">
+                <?php foreach ($product_images as $index => $img): ?>
+                <div class="cursor-pointer border-2 rounded-lg overflow-hidden hover:border-indigo-500 transition <?= $index === 0 ? 'border-indigo-500' : 'border-gray-200' ?>" 
+                     onclick="changeImage('<?= esc($img['image_url']) ?>', this)">
+                    <img src="<?= esc($img['image_url']) ?>" alt="Thumbnail <?= $index + 1 ?>" 
+                         class="w-full h-24 object-cover">
+                </div>
+                <?php endforeach; ?>
+            </div>
+
+            <script>
+            function changeImage(imageUrl, element) {
+                document.getElementById('mainImage').src = imageUrl;
+                
+                // Remove active border from all thumbnails
+                document.querySelectorAll('.grid.grid-cols-4 > div').forEach(div => {
+                    div.classList.remove('border-indigo-500');
+                    div.classList.add('border-gray-200');
+                });
+                
+                // Add active border to clicked thumbnail
+                element.classList.remove('border-gray-200');
+                element.classList.add('border-indigo-500');
+            }
+            </script>
+            <?php else: ?>
+            <!-- Fallback to main product image -->
             <img src="<?= esc($product['image']) ?>" alt="<?= esc($product['name']) ?>" 
                  class="w-full rounded-lg shadow-lg">
+            <?php endif; ?>
         </div>
 
         <!-- Product Info -->

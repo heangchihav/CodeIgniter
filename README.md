@@ -4,11 +4,22 @@ A simple e-commerce application built with CodeIgniter 4 and PostgreSQL.
 
 ## Features
 
+### Customer Features
 - Product catalog with categories
 - Shopping cart
-- Checkout process
-- Order management
+- Checkout process (guest or logged-in)
+- Customer authentication (Login/Register)
+- Customer dashboard
+- Order history and tracking
+- Profile management
 - Responsive design with TailwindCSS
+
+### Admin Features
+- Admin authentication (Login/Register)
+- Dashboard with statistics
+- Product management (CRUD)
+- Category management (CRUD)
+- Protected admin routes
 
 ## Requirements
 
@@ -70,6 +81,31 @@ php spark serve
 ```
 
 Visit: http://localhost:8080
+
+## User Access
+
+### Customer Account
+- **Login:** http://localhost:8080/login
+- **Register:** http://localhost:8080/register
+- **Dashboard:** http://localhost:8080/account
+
+**Customer Features:**
+- View order history
+- Track order status
+- Manage profile
+- Faster checkout when logged in
+
+### Admin Panel
+- **URL:** http://localhost:8080/admin/login
+- **Username:** admin
+- **Password:** admin123
+
+**Admin Features:**
+- Dashboard with statistics
+- Manage products (Create, Edit, Delete)
+- Manage categories (Create, Edit, Delete)
+- View all orders
+- Register new admin users
 
 ## Project Structure
 
