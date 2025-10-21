@@ -87,7 +87,8 @@
         <div class="px-6 py-4 border-b">
             <h2 class="text-lg font-semibold">Order Items</h2>
         </div>
-        <table class="min-w-full divide-y divide-gray-200">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
@@ -129,6 +130,7 @@
                 </tr>
             </tbody>
         </table>
+        </div>
     </div>
 
     <div class="mt-6">

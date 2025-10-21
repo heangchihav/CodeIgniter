@@ -15,18 +15,6 @@
         </div>
     </div>
 
-    <?php if (session()->getFlashdata('success')): ?>
-    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-        <?= session()->getFlashdata('success') ?>
-    </div>
-    <?php endif; ?>
-
-    <?php if (session()->getFlashdata('error')): ?>
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-        <?= session()->getFlashdata('error') ?>
-    </div>
-    <?php endif; ?>
-
     <!-- Hidden form for cancellation -->
     <form id="cancelForm" action="<?= base_url('/account/orders/cancel/' . $order['id']) ?>" method="post" style="display: none;">
         <?= csrf_field() ?>
@@ -90,7 +78,8 @@
         <div class="px-6 py-4 border-b">
             <h2 class="text-lg font-semibold">Order Items</h2>
         </div>
-        <table class="min-w-full divide-y divide-gray-200">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
@@ -137,6 +126,7 @@
                 </tr>
             </tbody>
         </table>
+        </div>
     </div>
 
     <div class="mt-8 flex justify-between">
