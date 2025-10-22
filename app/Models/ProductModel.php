@@ -14,7 +14,8 @@ class ProductModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'category_id', 'name', 'slug', 'description', 
-        'price', 'stock', 'image', 'is_active'
+        'price', 'original_price', 'stock', 'image', 'is_active', 
+        'is_featured', 'is_new', 'is_popular', 'discount_percentage'
     ];
 
     // Dates
@@ -64,9 +65,84 @@ class ProductModel extends Model
 
     public function getFeaturedProducts($limit = 8)
     {
-        return $this->where('is_active', true)
+        return $this->where('is_featured', true)
+                    ->where('is_active', true)
                     ->orderBy('created_at', 'DESC')
                     ->limit($limit)
                     ->findAll();
+    }
+
+    public function getNewProducts($limit = 8)
+    {
+        return $this->where('is_new', true)
+                    ->where('is_active', true)
+                    ->orderBy('created_at', 'DESC')
+                    ->limit($limit)
+                    ->findAll();
+    }
+
+    public function getPopularProducts($limit = 8)
+    {
+        return $this->where('is_popular', true)
+                    ->where('is_active', true)
+                    ->orderBy('created_at', 'DESC')
+                    ->limit($limit)
+                    ->findAll();
+    }
+
+    public function getDiscountedProducts($limit = 8)
+    {
+        return $this->where('discount_percentage >', 0)
+                    ->where('is_active', true)
+                    ->orderBy('discount_percentage', 'DESC')
+                    ->limit($limit)
+                    ->findAll();
+    }
+
+    /**
+     * Auto-calculate product features based on real metrics
+     */
+    public function autoCalculateFeatures($productId)
+    {
+        $product = $this->find($productId);
+        if (!$product) {
+            return false;
+        }
+
+        $updates = [];
+
+        // Auto-detect NEW: Created within last 30 days
+        $createdAt = strtotime($product['created_at']);
+        $thirtyDaysAgo = strtotime('-30 days');
+        $updates['is_new'] = ($createdAt >= $thirtyDaysAgo);
+
+        // Auto-detect FEATURED: Has discount > 15% OR high stock (>50)
+        $hasGoodDiscount = ($product['discount_percentage'] ?? 0) > 15;
+        $hasHighStock = ($product['stock'] ?? 0) > 50;
+        $updates['is_featured'] = ($hasGoodDiscount || $hasHighStock);
+
+        // Auto-detect POPULAR: Will be based on order count (for now, use stock sold logic)
+        // If stock is between 20-50, assume it's selling well
+        $stock = $product['stock'] ?? 0;
+        $updates['is_popular'] = ($stock >= 20 && $stock <= 80);
+
+        return $this->update($productId, $updates);
+    }
+
+    /**
+     * Auto-calculate all products features
+     */
+    public function autoCalculateAllFeatures()
+    {
+        $products = $this->findAll();
+        $updated = 0;
+
+        foreach ($products as $product) {
+            if ($this->autoCalculateFeatures($product['id'])) {
+                $updated++;
+            }
+        }
+
+        return $updated;
     }
 }

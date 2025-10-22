@@ -14,7 +14,7 @@ class OrderModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'customer_id', 'order_number', 'total_amount', 
-        'status', 'shipping_address', 'notes'
+        'status', 'shipping_address', 'notes', 'payment_slip'
     ];
 
     // Dates

@@ -70,16 +70,83 @@
         </div>
     </div>
 
-    <!-- Shipping Address -->
-    <div class="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 class="text-lg font-semibold mb-4">Shipping Address</h2>
-        <p class="text-sm text-gray-700 whitespace-pre-line"><?= esc($order['shipping_address']) ?></p>
-        <?php if ($order['notes']): ?>
-        <div class="mt-4 pt-4 border-t">
-            <p class="text-sm text-gray-600 font-semibold">Order Notes:</p>
-            <p class="text-sm text-gray-700 mt-1"><?= esc($order['notes']) ?></p>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Shipping Address -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-semibold mb-4">Shipping Address</h2>
+            <p class="text-sm text-gray-700 whitespace-pre-line"><?= esc($order['shipping_address']) ?></p>
+            <?php if ($order['notes']): ?>
+            <div class="mt-4 pt-4 border-t">
+                <p class="text-sm text-gray-600 font-semibold">Order Notes:</p>
+                <p class="text-sm text-gray-700 mt-1"><?= esc($order['notes']) ?></p>
+            </div>
+            <?php endif; ?>
         </div>
-        <?php endif; ?>
+
+        <!-- Payment Slip -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-semibold mb-4 flex items-center">
+                <i class="fas fa-receipt mr-2 text-indigo-600"></i>
+                Payment Slip
+            </h2>
+            <?php if (!empty($order['payment_slip'])): ?>
+                <div class="space-y-3">
+                    <div class="border-2 border-gray-200 rounded-lg p-3 bg-gray-50">
+                        <?php 
+                        $fileExt = pathinfo($order['payment_slip'], PATHINFO_EXTENSION);
+                        $isPdf = strtolower($fileExt) === 'pdf';
+                        ?>
+                        
+                        <?php if ($isPdf): ?>
+                            <!-- PDF Preview -->
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-file-pdf text-3xl text-red-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">PDF Document</p>
+                                    <p class="text-xs text-gray-500">Payment slip uploaded</p>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <!-- Image Preview -->
+                            <img src="<?= base_url($order['payment_slip']) ?>" 
+                                 alt="Payment Slip" 
+                                 class="w-full rounded-lg object-contain max-h-64 cursor-pointer hover:opacity-90 transition"
+                                 onclick="window.open('<?= base_url($order['payment_slip']) ?>', '_blank')">
+                        <?php endif; ?>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <a href="<?= base_url($order['payment_slip']) ?>" 
+                           target="_blank"
+                           class="flex-1 inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                            <i class="fas fa-eye"></i>
+                            View Full Size
+                        </a>
+                        <a href="<?= base_url($order['payment_slip']) ?>" 
+                           download
+                           class="flex-1 inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                            <i class="fas fa-download"></i>
+                            Download
+                        </a>
+                    </div>
+                    
+                    <div class="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <i class="fas fa-check-circle text-green-600"></i>
+                        <span class="text-sm text-green-800 font-medium">Payment slip uploaded</span>
+                    </div>
+                </div>
+            <?php else: ?>
+                <div class="text-center py-8">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-3">
+                        <i class="fas fa-receipt text-2xl text-gray-400"></i>
+                    </div>
+                    <p class="text-sm text-gray-600 font-medium">No payment slip uploaded</p>
+                    <p class="text-xs text-gray-500 mt-1">Customer hasn't uploaded payment proof yet</p>
+                </div>
+            <?php endif; ?>
+        </div>
     </div>
 
     <!-- Order Items -->

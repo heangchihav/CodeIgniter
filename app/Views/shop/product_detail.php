@@ -60,25 +60,107 @@
         <div>
             <h1 class="text-3xl font-bold text-gray-900 mb-4"><?= esc($product['name']) ?></h1>
             
-            <div class="mb-4">
-                <span class="inline-block bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">
-                    <?= esc($category['name']) ?>
+            <!-- Category and Badges -->
+            <div class="mb-4 flex flex-wrap gap-2">
+                <span class="inline-block bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-semibold">
+                    <i class="fas fa-tag mr-1"></i><?= esc($category['name']) ?>
                 </span>
+                
+                <?php if (!empty($product['is_new'])): ?>
+                <span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
+                    <i class="fas fa-sparkles mr-1"></i>NEW
+                </span>
+                <?php endif; ?>
+                
+                <?php if (!empty($product['is_featured'])): ?>
+                <span class="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">
+                    <i class="fas fa-star mr-1"></i>FEATURED
+                </span>
+                <?php endif; ?>
+                
+                <?php if (!empty($product['is_popular'])): ?>
+                <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">
+                    <i class="fas fa-fire mr-1"></i>POPULAR
+                </span>
+                <?php endif; ?>
             </div>
 
-            <div class="mb-6">
-                <span class="text-4xl font-bold text-indigo-600">$<?= number_format($product['price'], 2) ?></span>
+            <!-- Price Section -->
+            <div class="mb-6 bg-gray-50 p-4 rounded-lg">
+                <?php if (!empty($product['discount_percentage']) && $product['discount_percentage'] > 0): ?>
+                    <!-- Discounted Price -->
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="text-4xl font-bold text-red-600">$<?= number_format($product['price'], 2) ?></span>
+                        <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                            -<?= number_format($product['discount_percentage'], 0) ?>% OFF
+                        </span>
+                    </div>
+                    <?php if (!empty($product['original_price'])): ?>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl text-gray-500 line-through">$<?= number_format($product['original_price'], 2) ?></span>
+                        <span class="text-green-600 font-semibold">
+                            Save $<?= number_format($product['original_price'] - $product['price'], 2) ?>
+                        </span>
+                    </div>
+                    <?php endif; ?>
+                <?php else: ?>
+                    <!-- Regular Price -->
+                    <span class="text-4xl font-bold text-indigo-600">$<?= number_format($product['price'], 2) ?></span>
+                <?php endif; ?>
             </div>
 
+            <!-- Description -->
             <div class="mb-6">
-                <p class="text-gray-700 leading-relaxed"><?= esc($product['description']) ?></p>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Description</h3>
+                <p class="text-gray-700 leading-relaxed"><?= nl2br(esc($product['description'])) ?></p>
             </div>
 
-            <div class="mb-6">
-                <p class="text-gray-600">
-                    <i class="fas fa-box mr-2"></i>
-                    <span class="font-semibold">Stock:</span> <?= $product['stock'] ?> available
-                </p>
+            <!-- Product Details -->
+            <div class="mb-6 bg-blue-50 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Product Details</h3>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">
+                            <i class="fas fa-box mr-2 text-indigo-600"></i>
+                            <span class="font-semibold">Stock:</span>
+                        </span>
+                        <span class="font-bold <?= $product['stock'] > 10 ? 'text-green-600' : 'text-red-600' ?>">
+                            <?= $product['stock'] ?> available
+                        </span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">
+                            <i class="fas fa-check-circle mr-2 text-indigo-600"></i>
+                            <span class="font-semibold">Status:</span>
+                        </span>
+                        <span class="font-bold <?= $product['is_active'] ? 'text-green-600' : 'text-gray-400' ?>">
+                            <?= $product['is_active'] ? 'In Stock' : 'Out of Stock' ?>
+                        </span>
+                    </div>
+                    
+                    <?php if (!empty($product['discount_percentage']) && $product['discount_percentage'] > 0): ?>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">
+                            <i class="fas fa-percentage mr-2 text-indigo-600"></i>
+                            <span class="font-semibold">Discount:</span>
+                        </span>
+                        <span class="font-bold text-red-600">
+                            <?= number_format($product['discount_percentage'], 0) ?>% OFF
+                        </span>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">
+                            <i class="fas fa-calendar-alt mr-2 text-indigo-600"></i>
+                            <span class="font-semibold">Added:</span>
+                        </span>
+                        <span class="text-gray-700">
+                            <?= date('M d, Y', strtotime($product['created_at'])) ?>
+                        </span>
+                    </div>
+                </div>
             </div>
 
             <!-- Add to Cart Form -->
@@ -102,24 +184,14 @@
     <!-- Related Products -->
     <?php if (!empty($relatedProducts)): ?>
     <div class="mt-16">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Related Products</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+            <i class="fas fa-layer-group mr-3 text-indigo-600"></i>
+            Related Products
+        </h2>
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <?php foreach ($relatedProducts as $relatedProduct): ?>
                 <?php if ($relatedProduct['id'] != $product['id']): ?>
-                <div class="bg-white rounded-lg shadow hover:shadow-xl transition">
-                    <a href="<?= base_url('/product/' . $relatedProduct['slug']) ?>">
-                        <img src="<?= esc($relatedProduct['image']) ?>" alt="<?= esc($relatedProduct['name']) ?>" 
-                             class="w-full h-48 object-cover rounded-t-lg">
-                    </a>
-                    <div class="p-4">
-                        <a href="<?= base_url('/product/' . $relatedProduct['slug']) ?>">
-                            <h3 class="font-semibold text-gray-900 mb-2 hover:text-indigo-600"><?= esc($relatedProduct['name']) ?></h3>
-                        </a>
-                        <div class="flex justify-between items-center">
-                            <span class="text-xl font-bold text-indigo-600">$<?= number_format($relatedProduct['price'], 2) ?></span>
-                        </div>
-                    </div>
-                </div>
+                <?= view('components/product_card', ['product' => $relatedProduct, 'badgeType' => 'none']) ?>
                 <?php endif; ?>
             <?php endforeach; ?>
         </div>

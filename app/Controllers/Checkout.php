@@ -5,18 +5,21 @@ namespace App\Controllers;
 use App\Models\ProductModel;
 use App\Models\OrderModel;
 use App\Models\OrderItemModel;
+use App\Models\PaymentMethodModel;
 
 class Checkout extends BaseController
 {
     protected $productModel;
     protected $orderModel;
     protected $orderItemModel;
+    protected $paymentMethodModel;
 
     public function __construct()
     {
         $this->productModel = new ProductModel();
         $this->orderModel = new OrderModel();
         $this->orderItemModel = new OrderItemModel();
+        $this->paymentMethodModel = new PaymentMethodModel();
         helper(['form', 'url']);
     }
 
@@ -44,10 +47,14 @@ class Checkout extends BaseController
             }
         }
 
+        // Get active payment methods
+        $paymentMethods = $this->paymentMethodModel->getActivePaymentMethods();
+
         $data = [
-            'title'     => 'Checkout',
-            'cartItems' => $cartItems,
-            'total'     => $total,
+            'title'          => 'Checkout',
+            'cartItems'      => $cartItems,
+            'total'          => $total,
+            'paymentMethods' => $paymentMethods,
         ];
 
         return view('shop/checkout', $data);
@@ -113,6 +120,37 @@ class Checkout extends BaseController
             }
         }
 
+        // Handle payment slip upload
+        $paymentSlipPath = null;
+        $file = $this->request->getFile('payment_slip');
+        
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            // Validate file
+            $validationRules = [
+                'payment_slip' => [
+                    'uploaded[payment_slip]',
+                    'max_size[payment_slip,5120]', // 5MB
+                    'ext_in[payment_slip,jpg,jpeg,png,pdf]',
+                ],
+            ];
+            
+            if ($this->validate($validationRules)) {
+                // Create uploads directory if it doesn't exist
+                $uploadPath = WRITEPATH . '../public/uploads/payment_slips';
+                if (!is_dir($uploadPath)) {
+                    mkdir($uploadPath, 0755, true);
+                }
+                
+                // Generate unique filename
+                $newName = 'slip_' . time() . '_' . uniqid() . '.' . $file->getExtension();
+                
+                // Move file
+                if ($file->move($uploadPath, $newName)) {
+                    $paymentSlipPath = 'uploads/payment_slips/' . $newName;
+                }
+            }
+        }
+
         // Create order
         $orderData = [
             'customer_id'      => $customerId,
@@ -121,6 +159,7 @@ class Checkout extends BaseController
             'status'           => 'pending',
             'shipping_address' => $this->request->getPost('shipping_address'),
             'notes'            => $this->request->getPost('notes'),
+            'payment_slip'     => $paymentSlipPath,
         ];
 
         $orderId = $this->orderModel->insert($orderData);

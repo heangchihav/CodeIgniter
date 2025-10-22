@@ -113,6 +113,69 @@ class Account extends BaseController
         return redirect()->back()->withInput()->with('error', 'Failed to update profile');
     }
 
+    public function uploadPaymentSlip($orderId)
+    {
+        $customerId = session()->get('customer_id');
+        
+        // Verify order belongs to customer
+        $order = $this->orderModel->where('id', $orderId)
+                                  ->where('customer_id', $customerId)
+                                  ->first();
+        
+        if (!$order) {
+            return redirect()->to('/account/orders')->with('error', 'Order not found');
+        }
+        
+        // Handle file upload
+        $file = $this->request->getFile('payment_slip');
+        
+        if (!$file || !$file->isValid()) {
+            return redirect()->back()->with('error', 'Please select a valid file');
+        }
+        
+        // Validate file
+        $validationRules = [
+            'payment_slip' => [
+                'uploaded[payment_slip]',
+                'max_size[payment_slip,5120]', // 5MB
+                'ext_in[payment_slip,jpg,jpeg,png,pdf]',
+            ],
+        ];
+        
+        if (!$this->validate($validationRules)) {
+            return redirect()->back()->with('error', 'Invalid file. Please upload JPG, PNG, or PDF (max 5MB)');
+        }
+        
+        // Create uploads directory if it doesn't exist
+        $uploadPath = WRITEPATH . '../public/uploads/payment_slips';
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0755, true);
+        }
+        
+        // Delete old payment slip if exists
+        if (!empty($order['payment_slip'])) {
+            $oldFile = FCPATH . $order['payment_slip'];
+            if (file_exists($oldFile)) {
+                unlink($oldFile);
+            }
+        }
+        
+        // Generate unique filename
+        $newName = 'slip_' . time() . '_' . uniqid() . '.' . $file->getExtension();
+        
+        // Move file
+        if ($file->move($uploadPath, $newName)) {
+            $paymentSlipPath = 'uploads/payment_slips/' . $newName;
+            
+            // Update order
+            $this->orderModel->update($orderId, ['payment_slip' => $paymentSlipPath]);
+            
+            return redirect()->back()->with('success', 'Payment slip uploaded successfully');
+        }
+        
+        return redirect()->back()->with('error', 'Failed to upload payment slip');
+    }
+
     public function cancelOrder($orderId)
     {
         $customerId = session()->get('customer_id');

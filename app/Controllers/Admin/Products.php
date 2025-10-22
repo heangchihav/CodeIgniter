@@ -56,18 +56,36 @@ class Products extends BaseController
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
 
+        $originalPrice = $this->request->getPost('original_price');
+        $discountPercentage = $this->request->getPost('discount_percentage');
+        $autoCalculate = $this->request->getPost('auto_calculate_features');
+        
         $data = [
-            'category_id' => $this->request->getPost('category_id'),
-            'name'        => $this->request->getPost('name'),
-            'slug'        => $this->request->getPost('slug'),
-            'description' => $this->request->getPost('description'),
-            'price'       => $this->request->getPost('price'),
-            'stock'       => $this->request->getPost('stock'),
-            'image'       => $this->request->getPost('image'),
-            'is_active'   => $this->request->getPost('is_active') ? true : false,
+            'category_id'         => $this->request->getPost('category_id'),
+            'name'                => $this->request->getPost('name'),
+            'slug'                => $this->request->getPost('slug'),
+            'description'         => $this->request->getPost('description'),
+            'price'               => $this->request->getPost('price'),
+            'original_price'      => ($originalPrice && $originalPrice !== '') ? $originalPrice : null,
+            'discount_percentage' => ($discountPercentage && $discountPercentage !== '') ? $discountPercentage : 0,
+            'stock'               => $this->request->getPost('stock'),
+            'image'               => $this->request->getPost('image'),
+            'is_active'           => $this->request->getPost('is_active') ? true : false,
         ];
 
+        // Only set manual values if auto-calculate is not enabled
+        if (!$autoCalculate) {
+            $data['is_featured'] = $this->request->getPost('is_featured') ? true : false;
+            $data['is_new'] = $this->request->getPost('is_new') ? true : false;
+            $data['is_popular'] = $this->request->getPost('is_popular') ? true : false;
+        }
+
         $productId = $this->productModel->insert($data);
+
+        if ($productId && $autoCalculate) {
+            // Auto-calculate features after product is created
+            $this->productModel->autoCalculateFeatures($productId);
+        }
 
         if ($productId) {
             // Handle multiple images
@@ -124,17 +142,34 @@ class Products extends BaseController
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
 
+        $originalPrice = $this->request->getPost('original_price');
+        $discountPercentage = $this->request->getPost('discount_percentage');
+        $autoCalculate = $this->request->getPost('auto_calculate_features');
+        
         $data = [
-            'category_id' => $this->request->getPost('category_id'),
-            'name'        => $this->request->getPost('name'),
-            'description' => $this->request->getPost('description'),
-            'price'       => $this->request->getPost('price'),
-            'stock'       => $this->request->getPost('stock'),
-            'image'       => $this->request->getPost('image'),
-            'is_active'   => $this->request->getPost('is_active') ? true : false,
+            'category_id'         => $this->request->getPost('category_id'),
+            'name'                => $this->request->getPost('name'),
+            'description'         => $this->request->getPost('description'),
+            'price'               => $this->request->getPost('price'),
+            'original_price'      => ($originalPrice && $originalPrice !== '') ? $originalPrice : null,
+            'discount_percentage' => ($discountPercentage && $discountPercentage !== '') ? $discountPercentage : 0,
+            'stock'               => $this->request->getPost('stock'),
+            'image'               => $this->request->getPost('image'),
+            'is_active'           => $this->request->getPost('is_active') ? true : false,
         ];
 
+        // Only set manual values if auto-calculate is not enabled
+        if (!$autoCalculate) {
+            $data['is_featured'] = $this->request->getPost('is_featured') ? true : false;
+            $data['is_new'] = $this->request->getPost('is_new') ? true : false;
+            $data['is_popular'] = $this->request->getPost('is_popular') ? true : false;
+        }
+
         if ($this->productModel->update($id, $data)) {
+            // Auto-calculate features if enabled
+            if ($autoCalculate) {
+                $this->productModel->autoCalculateFeatures($id);
+            }
             return redirect()->to('/admin/products')->with('success', 'Product updated successfully');
         }
 

@@ -1,6 +1,25 @@
 <?= view('layout/header') ?>
 
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Flash Messages -->
+    <?php if (session()->getFlashdata('success')): ?>
+    <div class="mb-6 bg-green-50 border-l-4 border-green-500 text-green-800 px-4 py-3 rounded-r shadow-sm">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-check-circle text-green-500"></i>
+            <p class="font-medium"><?= session()->getFlashdata('success') ?></p>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('error')): ?>
+    <div class="mb-6 bg-red-50 border-l-4 border-red-500 text-red-800 px-4 py-3 rounded-r shadow-sm">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-exclamation-circle text-red-500"></i>
+            <p class="font-medium"><?= session()->getFlashdata('error') ?></p>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <div class="mb-8">
         <div class="flex justify-between items-start">
             <div>
@@ -72,6 +91,152 @@
             <?php endif; ?>
         </div>
     </div>
+
+    <!-- Payment Slip Section -->
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <h2 class="text-lg font-semibold mb-4 flex items-center">
+            <i class="fas fa-receipt mr-2 text-indigo-600"></i>
+            Payment Slip
+        </h2>
+        
+        <?php if (isset($order['payment_slip']) && !empty($order['payment_slip'])): ?>
+            <!-- Display existing payment slip -->
+            <div class="space-y-4">
+                <div class="border-2 border-gray-200 rounded-lg p-4 bg-gray-50">
+                    <?php 
+                    $fileExt = pathinfo($order['payment_slip'], PATHINFO_EXTENSION);
+                    $isPdf = strtolower($fileExt) === 'pdf';
+                    ?>
+                    
+                    <?php if ($isPdf): ?>
+                        <!-- PDF Preview -->
+                        <div class="flex items-center gap-3">
+                            <div class="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-file-pdf text-3xl text-red-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">PDF Document</p>
+                                <p class="text-xs text-gray-500">Payment slip uploaded</p>
+                            </div>
+                            <a href="<?= base_url($order['payment_slip']) ?>" 
+                               target="_blank"
+                               class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </a>
+                        </div>
+                    <?php else: ?>
+                        <!-- Image Preview -->
+                        <img src="<?= base_url($order['payment_slip']) ?>" 
+                             alt="Payment Slip" 
+                             class="w-full max-w-md mx-auto rounded-lg object-contain max-h-96 cursor-pointer hover:opacity-90 transition"
+                             onclick="window.open('<?= base_url($order['payment_slip']) ?>', '_blank')">
+                    <?php endif; ?>
+                </div>
+                
+                <!-- Upload new slip form -->
+                <?php if ($order['status'] !== 'cancelled'): ?>
+                <div class="pt-4 border-t">
+                    <p class="text-sm text-gray-600 mb-3">Want to upload a different payment slip?</p>
+                    <form action="<?= base_url('/account/orders/upload-slip/' . $order['id']) ?>" 
+                          method="post" 
+                          enctype="multipart/form-data"
+                          id="uploadSlipForm">
+                        <?= csrf_field() ?>
+                        <div class="flex gap-3">
+                            <input type="file" 
+                                   name="payment_slip" 
+                                   id="payment_slip_update"
+                                   accept="image/jpeg,image/jpg,image/png,application/pdf"
+                                   required
+                                   class="flex-1 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer text-sm">
+                            <button type="submit" 
+                                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors whitespace-nowrap">
+                                <i class="fas fa-upload mr-2"></i>
+                                Replace
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">JPG, PNG, or PDF (Max 5MB)</p>
+                    </form>
+                </div>
+                <?php endif; ?>
+            </div>
+        <?php else: ?>
+            <!-- Upload payment slip form -->
+            <?php if ($order['status'] !== 'cancelled'): ?>
+            <div class="space-y-4">
+                <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p class="text-sm text-yellow-800">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <strong>Action Required:</strong> Please upload your payment slip to confirm your payment.
+                    </p>
+                </div>
+                
+                <form action="<?= base_url('/account/orders/upload-slip/' . $order['id']) ?>" 
+                      method="post" 
+                      enctype="multipart/form-data"
+                      id="uploadSlipForm">
+                    <?= csrf_field() ?>
+                    <div class="space-y-3">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Select Payment Slip
+                        </label>
+                        <input type="file" 
+                               name="payment_slip" 
+                               id="payment_slip_new"
+                               accept="image/jpeg,image/jpg,image/png,application/pdf"
+                               required
+                               class="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                        <p class="text-xs text-gray-500">Supported formats: JPG, PNG, PDF (Max 5MB)</p>
+                        
+                        <div id="slip-preview" class="hidden mt-3">
+                            <div class="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                <i class="fas fa-check-circle text-green-600"></i>
+                                <span class="text-sm text-green-800 font-medium" id="slip-file-name"></span>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" 
+                                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                            <i class="fas fa-upload mr-2"></i>
+                            Upload Payment Slip
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <?php else: ?>
+            <div class="text-center py-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-3">
+                    <i class="fas fa-ban text-2xl text-gray-400"></i>
+                </div>
+                <p class="text-sm text-gray-600 font-medium">Order Cancelled</p>
+                <p class="text-xs text-gray-500 mt-1">Payment slip upload is not available for cancelled orders</p>
+            </div>
+            <?php endif; ?>
+        <?php endif; ?>
+    </div>
+
+    <script>
+    // File preview for new upload
+    document.getElementById('payment_slip_new')?.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('slip-preview');
+        const fileName = document.getElementById('slip-file-name');
+        
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB');
+                e.target.value = '';
+                preview.classList.add('hidden');
+                return;
+            }
+            fileName.textContent = file.name;
+            preview.classList.remove('hidden');
+        } else {
+            preview.classList.add('hidden');
+        }
+    });
+    </script>
 
     <!-- Order Items -->
     <div class="bg-white rounded-lg shadow overflow-hidden">

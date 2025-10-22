@@ -51,6 +51,20 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Original Price (for discount display)</label>
+                    <input type="number" name="original_price" step="0.01"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                           value="<?= $product['original_price'] ?? '' ?>">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Discount %</label>
+                    <input type="number" name="discount_percentage" step="0.01" min="0" max="100"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                           value="<?= $product['discount_percentage'] ?? 0 ?>">
+                </div>
+
+                <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Stock *</label>
                     <input type="number" name="stock" required
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -72,12 +86,81 @@
             </div>
 
             <div class="mt-6">
-                <label class="flex items-center">
-                    <input type="checkbox" name="is_active" value="1" <?= $product['is_active'] ? 'checked' : '' ?>
-                           class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                    <span class="ml-2 text-sm text-gray-700">Active</span>
-                </label>
+                <label class="block text-sm font-medium text-gray-700 mb-3">Product Tags</label>
+                
+                <!-- Auto-Calculate Option -->
+                <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <label class="flex items-center">
+                        <input type="checkbox" name="auto_calculate_features" value="1" id="autoCalculate" checked
+                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                               onchange="toggleManualFeatures(this)">
+                        <span class="ml-2 text-sm font-semibold text-blue-900">
+                            <i class="fas fa-magic mr-1"></i> Auto-Calculate Features
+                        </span>
+                    </label>
+                    <p class="ml-6 mt-1 text-xs text-blue-700">
+                        Automatically determine Featured, New, and Popular based on product data:
+                        <br>• <strong>New:</strong> Created within last 30 days
+                        <br>• <strong>Featured:</strong> Discount > 15% OR Stock > 50
+                        <br>• <strong>Popular:</strong> Stock between 20-80 (selling well)
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="manualFeatures">
+                    <label class="flex items-center">
+                        <input type="checkbox" name="is_active" value="1" <?= $product['is_active'] ? 'checked' : '' ?>
+                               class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <span class="ml-2 text-sm text-gray-700">Active</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" name="is_featured" value="1" <?= ($product['is_featured'] ?? 0) ? 'checked' : '' ?>
+                               class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" id="isFeatured">
+                        <span class="ml-2 text-sm text-gray-700">Featured</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" name="is_new" value="1" <?= ($product['is_new'] ?? 0) ? 'checked' : '' ?>
+                               class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" id="isNew">
+                        <span class="ml-2 text-sm text-gray-700">New Arrival</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" name="is_popular" value="1" <?= ($product['is_popular'] ?? 0) ? 'checked' : '' ?>
+                               class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" id="isPopular">
+                        <span class="ml-2 text-sm text-gray-700">Popular</span>
+                    </label>
+                </div>
             </div>
+
+            <script>
+            function toggleManualFeatures(checkbox) {
+                const featuredCheckbox = document.getElementById('isFeatured');
+                const newCheckbox = document.getElementById('isNew');
+                const popularCheckbox = document.getElementById('isPopular');
+                
+                if (checkbox.checked) {
+                    featuredCheckbox.disabled = true;
+                    newCheckbox.disabled = true;
+                    popularCheckbox.disabled = true;
+                    featuredCheckbox.parentElement.style.opacity = '0.5';
+                    newCheckbox.parentElement.style.opacity = '0.5';
+                    popularCheckbox.parentElement.style.opacity = '0.5';
+                } else {
+                    featuredCheckbox.disabled = false;
+                    newCheckbox.disabled = false;
+                    popularCheckbox.disabled = false;
+                    featuredCheckbox.parentElement.style.opacity = '1';
+                    newCheckbox.parentElement.style.opacity = '1';
+                    popularCheckbox.parentElement.style.opacity = '1';
+                }
+            }
+
+            // Initialize on page load - disable manual checkboxes since auto-calculate is checked by default
+            document.addEventListener('DOMContentLoaded', function() {
+                const autoCheckbox = document.getElementById('autoCalculate');
+                if (autoCheckbox && autoCheckbox.checked) {
+                    toggleManualFeatures(autoCheckbox);
+                }
+            });
+            </script>
 
             <div class="mt-8 flex justify-end space-x-4">
                 <a href="<?= base_url('/admin/products') ?>" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">

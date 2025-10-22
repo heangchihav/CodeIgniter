@@ -8,6 +8,10 @@ use CodeIgniter\Router\RouteCollection;
 // Shop Routes
 $routes->get('/', 'Shop::index');
 $routes->get('/products', 'Shop::products');
+$routes->get('/products/featured', 'Shop::featured');
+$routes->get('/products/new', 'Shop::newArrivals');
+$routes->get('/products/popular', 'Shop::popular');
+$routes->get('/products/deals', 'Shop::deals');
 $routes->get('/product/(:segment)', 'Shop::product/$1');
 $routes->get('/search', 'Shop::search');
 
@@ -36,6 +40,7 @@ $routes->group('account', ['filter' => 'customerauth'], function($routes) {
     $routes->get('orders', 'Customer\Account::orders');
     $routes->get('orders/(:num)', 'Customer\Account::orderDetail/$1');
     $routes->post('orders/cancel/(:num)', 'Customer\Account::cancelOrder/$1');
+    $routes->post('orders/upload-slip/(:num)', 'Customer\Account::uploadPaymentSlip/$1');
     $routes->get('profile', 'Customer\Account::profile');
     $routes->post('profile/update', 'Customer\Account::updateProfile');
 });
@@ -72,6 +77,15 @@ $routes->group('admin', ['filter' => 'adminauth'], function($routes) {
     $routes->post('categories/update/(:num)', 'Admin\Categories::update/$1');
     $routes->get('categories/delete/(:num)', 'Admin\Categories::delete/$1');
     
+    // Banners
+    $routes->get('banners', 'Admin\Banners::index');
+    $routes->get('banners/create', 'Admin\Banners::create');
+    $routes->post('banners/store', 'Admin\Banners::store');
+    $routes->get('banners/edit/(:num)', 'Admin\Banners::edit/$1');
+    $routes->post('banners/update/(:num)', 'Admin\Banners::update/$1');
+    $routes->get('banners/delete/(:num)', 'Admin\Banners::delete/$1');
+    $routes->get('banners/toggle/(:num)', 'Admin\Banners::toggleStatus/$1');
+    
     // Orders
     $routes->get('orders', 'Admin\Orders::index');
     $routes->get('orders/view/(:num)', 'Admin\Orders::view/$1');
@@ -82,4 +96,13 @@ $routes->group('admin', ['filter' => 'adminauth'], function($routes) {
     $routes->get('customers', 'Admin\Customers::index');
     $routes->get('customers/view/(:num)', 'Admin\Customers::view/$1');
     $routes->get('customers/delete/(:num)', 'Admin\Customers::delete/$1');
+    
+    // Payment Methods
+    $routes->get('payment-methods', 'Admin\PaymentMethods::index');
+    $routes->get('payment-methods/create', 'Admin\PaymentMethods::create');
+    $routes->post('payment-methods/store', 'Admin\PaymentMethods::store');
+    $routes->get('payment-methods/edit/(:num)', 'Admin\PaymentMethods::edit/$1');
+    $routes->post('payment-methods/update/(:num)', 'Admin\PaymentMethods::update/$1');
+    $routes->get('payment-methods/delete/(:num)', 'Admin\PaymentMethods::delete/$1');
+    $routes->get('payment-methods/toggle-status/(:num)', 'Admin\PaymentMethods::toggleStatus/$1');
 });
