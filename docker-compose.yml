@@ -1,4 +1,27 @@
 services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: codeigniter_mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_DATABASE:-ecommerce_db}
+      MYSQL_USER: ${DB_USERNAME:-dbuser}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-dbpassword}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - codeigniter_network
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # Nginx Reverse Proxy
   nginx:
     image: nginx:alpine
@@ -12,6 +35,7 @@ services:
     networks:
       - codeigniter_network
     depends_on:
+      - mysql
       - cloudflared
 
   # Cloudflare Tunnel
@@ -24,6 +48,10 @@ services:
       - codeigniter_network
     environment:
       - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+
+volumes:
+  mysql_data:
+    driver: local
 
 networks:
   codeigniter_network:

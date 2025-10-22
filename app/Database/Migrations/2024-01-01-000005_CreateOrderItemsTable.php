@@ -10,8 +10,10 @@ class CreateOrderItemsTable extends Migration
     {
         $this->forge->addField([
             'id' => [
-                'type'           => 'SERIAL',
+                'type'           => 'INT',
+                'constraint'     => 11,
                 'unsigned'       => true,
+                'auto_increment' => true,
             ],
             'order_id' => [
                 'type'       => 'INT',

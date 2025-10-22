@@ -10,8 +10,10 @@ class CreateProductImagesTable extends Migration
     {
         $this->forge->addField([
             'id' => [
-                'type'           => 'SERIAL',
+                'type'           => 'INT',
+                'constraint'     => 11,
                 'unsigned'       => true,
+                'auto_increment' => true,
             ],
             'product_id' => [
                 'type'       => 'INT',

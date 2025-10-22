@@ -10,8 +10,10 @@ class CreateProductsTable extends Migration
     {
         $this->forge->addField([
             'id' => [
-                'type'           => 'SERIAL',
+                'type'           => 'INT',
+                'constraint'     => 11,
                 'unsigned'       => true,
+                'auto_increment' => true,
             ],
             'category_id' => [
                 'type'       => 'INT',
