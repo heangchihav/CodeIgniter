@@ -6,8 +6,108 @@
     <title><?= esc($title ?? 'E-Commerce') ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Toast Notification Styles */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+        }
+        
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideInRight 0.3s ease-out;
+            min-width: 300px;
+        }
+        
+        .toast.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .toast.error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+        
+        .toast.info {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+        
+        .toast-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .toast-content {
+            flex: 1;
+        }
+        
+        .toast-close {
+            cursor: pointer;
+            font-size: 20px;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .toast-close:hover {
+            opacity: 1;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+        
+        .toast.removing {
+            animation: slideOutRight 0.3s ease-out forwards;
+        }
+        
+        @media (max-width: 640px) {
+            .toast-container {
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+            
+            .toast {
+                min-width: auto;
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
     <!-- Navigation -->
     <nav class="bg-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -122,21 +222,54 @@
     </script>
 
     <!-- Flash Messages -->
+    <script>
+    // Toast Notification System
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const icons = {
+            success: 'fa-check-circle',
+            error: 'fa-exclamation-circle',
+            info: 'fa-info-circle'
+        };
+        
+        toast.innerHTML = `
+            <i class="fas ${icons[type]} toast-icon"></i>
+            <div class="toast-content">${message}</div>
+            <i class="fas fa-times toast-close" onclick="closeToast(this)"></i>
+        `;
+        
+        container.appendChild(toast);
+        
+        // Auto remove after 4 seconds
+        setTimeout(() => {
+            closeToast(toast.querySelector('.toast-close'));
+        }, 4000);
+    }
+    
+    function closeToast(closeBtn) {
+        const toast = closeBtn.closest('.toast');
+        toast.classList.add('removing');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }
+    
+    // Show flash messages as toasts
     <?php if (session()->getFlashdata('success')): ?>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-            <span class="block sm:inline"><?= session()->getFlashdata('success') ?></span>
-        </div>
-    </div>
+    document.addEventListener('DOMContentLoaded', function() {
+        showToast('<?= addslashes(session()->getFlashdata('success')) ?>', 'success');
+    });
     <?php endif; ?>
-
+    
     <?php if (session()->getFlashdata('error')): ?>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-            <span class="block sm:inline"><?= session()->getFlashdata('error') ?></span>
-        </div>
-    </div>
+    document.addEventListener('DOMContentLoaded', function() {
+        showToast('<?= addslashes(session()->getFlashdata('error')) ?>', 'error');
+    });
     <?php endif; ?>
+    </script>
 
     <!-- Main Content -->
     <main class="min-h-screen">

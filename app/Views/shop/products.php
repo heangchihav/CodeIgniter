@@ -1,7 +1,7 @@
 <?= view('layout/header') ?>
 
 <div class="bg-gradient-to-b from-indigo-50 to-white min-h-screen">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-12">
         
         <!-- Page Header -->
         <div class="mb-8">
@@ -24,21 +24,16 @@
                             <?= esc($title) ?>
                         <?php endif; ?>
                     </h1>
-                    <p class="text-gray-600">
-                        <?php if (!empty($products)): ?>
-                            Showing <?= count($products) ?> product<?= count($products) !== 1 ? 's' : '' ?>
-                        <?php endif; ?>
-                    </p>
                 </div>
                 
                 <!-- View Toggle -->
-                <div class="hidden md:flex items-center gap-2">
-                    <span class="text-sm text-gray-600">View:</span>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs sm:text-sm text-gray-600 hidden sm:inline">View:</span>
                     <button id="gridViewBtn" onclick="switchView('grid')" class="p-2 bg-indigo-600 text-white rounded-lg transition">
-                        <i class="fas fa-th"></i>
+                        <i class="fas fa-th text-sm"></i>
                     </button>
                     <button id="listViewBtn" onclick="switchView('list')" class="p-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition">
-                        <i class="fas fa-list"></i>
+                        <i class="fas fa-list text-sm"></i>
                     </button>
                 </div>
             </div>
@@ -60,20 +55,40 @@
         </div>
 
         <!-- Filters Section -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-8">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-900 flex items-center">
                     <i class="fas fa-filter mr-2 text-indigo-600"></i>
-                    Filter by Category
+                    <span class="hidden sm:inline">Filter by Category</span>
+                    <span class="sm:hidden">Categories</span>
                 </h3>
                 <?php if (isset($_GET['category'])): ?>
-                <a href="<?= base_url('/products') ?>" class="text-sm text-indigo-600 hover:text-indigo-800">
-                    <i class="fas fa-times mr-1"></i>Clear Filter
+                <a href="<?= base_url('/products') ?>" class="text-xs sm:text-sm text-indigo-600 hover:text-indigo-800">
+                    <i class="fas fa-times mr-1"></i>Clear
                 </a>
                 <?php endif; ?>
             </div>
             
-            <div class="flex flex-wrap gap-3">
+            <!-- Mobile: Horizontal Scroll -->
+            <div class="overflow-x-auto scrollbar-hide sm:hidden">
+                <div class="flex gap-2 pb-2">
+                    <a href="<?= base_url('/products') ?>" 
+                       class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap <?= !isset($_GET['category']) ? 'bg-indigo-600 text-white shadow-lg' : 'bg-gray-100 text-gray-700' ?>">
+                        <i class="fas fa-th-large text-xs"></i>
+                        <span class="text-sm">All</span>
+                    </a>
+                    <?php foreach ($categories as $category): ?>
+                    <a href="<?= base_url('/products?category=' . $category['id']) ?>" 
+                       class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap <?= isset($_GET['category']) && $_GET['category'] == $category['id'] ? 'bg-indigo-600 text-white shadow-lg' : 'bg-gray-100 text-gray-700' ?>">
+                        <i class="fas fa-tag text-xs"></i>
+                        <span class="text-sm"><?= esc($category['name']) ?></span>
+                    </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- Desktop: Wrapped Layout -->
+            <div class="hidden sm:flex flex-wrap gap-3">
                 <a href="<?= base_url('/products') ?>" 
                    class="px-5 py-2.5 rounded-lg font-medium transition-all <?= !isset($_GET['category']) ? 'bg-indigo-600 text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' ?>">
                     <i class="fas fa-th-large mr-2"></i>All Products
@@ -87,9 +102,37 @@
             </div>
 
             <!-- Quick Filters -->
-            <div class="mt-6 pt-6 border-t border-gray-200">
-                <h4 class="text-sm font-semibold text-gray-700 mb-3">Quick Filters:</h4>
-                <div class="flex flex-wrap gap-2">
+            <div class="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
+                <h4 class="text-xs sm:text-sm font-semibold text-gray-700 mb-3">Quick Filters:</h4>
+                
+                <!-- Mobile: Horizontal Scroll -->
+                <div class="overflow-x-auto scrollbar-hide sm:hidden">
+                    <div class="flex gap-2 pb-2">
+                        <a href="<?= base_url('/products/deals') ?>" 
+                           class="flex-shrink-0 inline-flex items-center gap-1 px-3 py-2 rounded-lg transition text-xs font-medium whitespace-nowrap <?= (isset($filter) && $filter === 'deals') ? 'bg-red-600 text-white shadow-lg' : 'bg-red-50 text-red-700' ?>">
+                            <i class="fas fa-bolt"></i>
+                            <span>Deals</span>
+                        </a>
+                        <a href="<?= base_url('/products/new') ?>" 
+                           class="flex-shrink-0 inline-flex items-center gap-1 px-3 py-2 rounded-lg transition text-xs font-medium whitespace-nowrap <?= (isset($filter) && $filter === 'new') ? 'bg-green-600 text-white shadow-lg' : 'bg-green-50 text-green-700' ?>">
+                            <i class="fas fa-sparkles"></i>
+                            <span>New</span>
+                        </a>
+                        <a href="<?= base_url('/products/popular') ?>" 
+                           class="flex-shrink-0 inline-flex items-center gap-1 px-3 py-2 rounded-lg transition text-xs font-medium whitespace-nowrap <?= (isset($filter) && $filter === 'popular') ? 'bg-orange-600 text-white shadow-lg' : 'bg-orange-50 text-orange-700' ?>">
+                            <i class="fas fa-fire"></i>
+                            <span>Popular</span>
+                        </a>
+                        <a href="<?= base_url('/products/featured') ?>" 
+                           class="flex-shrink-0 inline-flex items-center gap-1 px-3 py-2 rounded-lg transition text-xs font-medium whitespace-nowrap <?= (isset($filter) && $filter === 'featured') ? 'bg-yellow-600 text-white shadow-lg' : 'bg-yellow-50 text-yellow-700' ?>">
+                            <i class="fas fa-star"></i>
+                            <span>Featured</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Desktop: Wrapped Layout -->
+                <div class="hidden sm:flex flex-wrap gap-2">
                     <a href="<?= base_url('/products/deals') ?>" 
                        class="px-4 py-2 rounded-lg transition text-sm font-medium <?= (isset($filter) && $filter === 'deals') ? 'bg-red-600 text-white shadow-lg' : 'bg-red-50 text-red-700 hover:bg-red-100' ?>">
                         <i class="fas fa-bolt mr-1"></i>Deals
@@ -128,7 +171,7 @@
         <?php else: ?>
         
         <!-- Grid View -->
-        <div id="gridView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div id="gridView" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-6">
             <?php foreach ($products as $product): ?>
                 <?= view('components/product_card', ['product' => $product]) ?>
             <?php endforeach; ?>
@@ -220,17 +263,32 @@
 
                             <div class="flex gap-2">
                                 <a href="<?= base_url('/product/' . $product['slug']) ?>" 
-                                   class="px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition">
-                                    <i class="fas fa-eye mr-1"></i> View
+                                   onclick="animateListViewClick(event, this)"
+                                   class="flex items-center justify-center px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition hover:scale-105 active:scale-95"
+                                   title="View Details">
+                                    <i class="fas fa-eye text-lg"></i>
+                                    <span class="ml-2 hidden md:inline">View</span>
                                 </a>
-                                <form action="<?= base_url('/cart/add') ?>" method="post">
+                                <?php if ($product['stock'] > 0): ?>
+                                <form action="<?= base_url('/cart/add') ?>" method="post" onsubmit="animateListAddToCart(event, this)">
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
                                     <input type="hidden" name="quantity" value="1">
-                                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                                        <i class="fas fa-cart-plus mr-1"></i> Add to Cart
+                                    <button type="submit" 
+                                            class="flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition hover:scale-105 active:scale-95 shadow-md"
+                                            title="Add to Cart">
+                                        <i class="fas fa-cart-plus text-lg"></i>
+                                        <span class="ml-2 hidden md:inline">Add to Cart</span>
                                     </button>
                                 </form>
+                                <?php else: ?>
+                                <button disabled
+                                        class="flex items-center justify-center px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed"
+                                        title="Out of Stock">
+                                    <i class="fas fa-ban text-lg"></i>
+                                    <span class="ml-2 hidden md:inline">Out of Stock</span>
+                                </button>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -249,6 +307,17 @@
         <?php endif; ?>
     </div>
 </div>
+
+<style>
+/* Hide scrollbar for horizontal scroll */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+</style>
 
 <script>
 // View switcher functionality
@@ -284,6 +353,116 @@ document.addEventListener('DOMContentLoaded', function() {
         switchView('list');
     }
 });
+
+// Animation for list view button click
+function animateListViewClick(event, link) {
+    event.preventDefault();
+    
+    const card = link.closest('.bg-white');
+    const icon = link.querySelector('i');
+    
+    // Animate the card
+    card.classList.add('ring-4', 'ring-blue-400', 'shadow-2xl');
+    link.classList.remove('border-indigo-600', 'text-indigo-600');
+    link.classList.add('bg-blue-100', 'border-blue-500', 'text-blue-700');
+    
+    // Pulse icon
+    icon.classList.add('animate-pulse');
+    
+    // Scale animation
+    card.style.transform = 'scale(1.01)';
+    
+    // Navigate after animation
+    setTimeout(() => {
+        window.location.href = link.href;
+    }, 300);
+}
+
+// Animation for list view add to cart
+function animateListAddToCart(event, form) {
+    event.preventDefault();
+    
+    const button = form.querySelector('button');
+    const card = form.closest('.bg-white');
+    const icon = button.querySelector('i');
+    
+    // Disable button temporarily
+    button.disabled = true;
+    
+    // Animate the card
+    card.classList.add('ring-4', 'ring-green-400', 'shadow-2xl');
+    
+    // Animate the icon
+    icon.classList.remove('fa-cart-plus');
+    icon.classList.add('fa-check');
+    button.classList.remove('bg-indigo-600');
+    button.classList.add('bg-green-600');
+    
+    // Scale animation
+    card.style.transform = 'scale(1.01)';
+    
+    // Submit via AJAX to prevent page reload
+    const formData = new FormData(form);
+    
+    fetch(form.action, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Update cart count if available
+            const cartCount = document.querySelector('.cart-count');
+            if (cartCount && data.cartCount) {
+                cartCount.textContent = data.cartCount;
+            }
+            
+            // Show success toast
+            if (typeof showToast === 'function') {
+                showToast(data.message || 'Product added to cart!', 'success');
+            }
+        } else {
+            // Show error toast
+            if (typeof showToast === 'function') {
+                showToast(data.message || 'Failed to add product', 'error');
+            }
+        }
+        
+        // Reset animation
+        setTimeout(() => {
+            card.classList.remove('ring-4', 'ring-green-400', 'shadow-2xl');
+            card.style.transform = 'scale(1)';
+            icon.classList.remove('fa-check');
+            icon.classList.add('fa-cart-plus');
+            button.classList.remove('bg-green-600');
+            button.classList.add('bg-indigo-600');
+            button.disabled = false;
+        }, 1000);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        if (typeof showToast === 'function') {
+            showToast('Failed to add product to cart', 'error');
+        }
+        
+        // Reset animation
+        card.classList.remove('ring-4', 'ring-green-400', 'shadow-2xl');
+        card.style.transform = 'scale(1)';
+        icon.classList.remove('fa-check');
+        icon.classList.add('fa-cart-plus');
+        button.classList.remove('bg-green-600');
+        button.classList.add('bg-indigo-600');
+        button.disabled = false;
+    });
+}
 </script>
 
 <?= view('layout/footer') ?>

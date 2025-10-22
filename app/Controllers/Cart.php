@@ -50,6 +50,15 @@ class Cart extends BaseController
         $product = $this->productModel->find($productId);
 
         if (!$product) {
+            // Check if request is AJAX
+            if ($this->request->isAJAX() || $this->request->getHeaderLine('X-Requested-With') === 'XMLHttpRequest') {
+                return $this->response
+                    ->setContentType('application/json')
+                    ->setJSON([
+                        'success' => false,
+                        'message' => 'Product not found'
+                    ]);
+            }
             return redirect()->back()->with('error', 'Product not found');
         }
 
@@ -62,6 +71,20 @@ class Cart extends BaseController
         }
 
         session()->set('cart', $cart);
+
+        // Calculate total cart count
+        $cartCount = array_sum($cart);
+
+        // Check if request is AJAX
+        if ($this->request->isAJAX() || $this->request->getHeaderLine('X-Requested-With') === 'XMLHttpRequest') {
+            return $this->response
+                ->setContentType('application/json')
+                ->setJSON([
+                    'success' => true,
+                    'message' => 'Product added to cart successfully!',
+                    'cartCount' => $cartCount
+                ]);
+        }
 
         return redirect()->back()->with('success', 'Product added to cart');
     }

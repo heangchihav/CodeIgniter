@@ -73,6 +73,15 @@
         pointer-events: auto;
     }
     
+    /* Hide scrollbar for horizontal scroll */
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+    
     @keyframes slideInLeft {
         from { 
             opacity: 0; 
@@ -234,7 +243,32 @@
         
         <!-- Sidebar - Categories -->
         <aside class="w-full lg:w-64 flex-shrink-0">
-            <div class="bg-white shadow-sm border border-gray-200 sticky top-4">
+            <!-- Mobile: Horizontal Scroll -->
+            <div class="lg:hidden mb-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-3 px-4">
+                    <i class="fas fa-th-large mr-2 text-gray-600"></i>
+                    Categories
+                </h2>
+                <div class="overflow-x-auto scrollbar-hide">
+                    <div class="flex gap-2 px-2 pb-2">
+                        <a href="<?= base_url('/products') ?>" 
+                           class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition whitespace-nowrap">
+                            <i class="fas fa-th-large"></i>
+                            <span>All</span>
+                        </a>
+                        <?php foreach ($categories as $category): ?>
+                        <a href="<?= base_url('/products?category=' . $category['id']) ?>" 
+                           class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-3 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition whitespace-nowrap">
+                            <i class="fas fa-tag"></i>
+                            <span><?= esc($category['name']) ?></span>
+                        </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desktop: Vertical Sidebar -->
+            <div class="hidden lg:block bg-white shadow-sm border border-gray-200 sticky top-4">
                 <div class="border-b border-gray-200 p-5">
                     <h2 class="text-xl font-semibold text-gray-900 flex items-center">
                         <i class="fas fa-th-large mr-2 text-gray-600"></i>
@@ -277,7 +311,7 @@
                         <i class="fas fa-arrow-right text-xs"></i>
                     </a>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-6">
                     <?php foreach ($discountedProducts as $product): ?>
                         <?= view('components/product_card', ['product' => $product, 'badgeType' => 'discount']) ?>
                     <?php endforeach; ?>
@@ -301,7 +335,7 @@
                         <i class="fas fa-arrow-right text-xs"></i>
                     </a>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-6">
                     <?php foreach ($newProducts as $product): ?>
                         <?= view('components/product_card', ['product' => $product, 'badgeType' => 'new']) ?>
                     <?php endforeach; ?>
@@ -325,7 +359,7 @@
                         <i class="fas fa-arrow-right text-xs"></i>
                     </a>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-6">
                     <?php foreach ($popularProducts as $product): ?>
                         <?= view('components/product_card', ['product' => $product, 'badgeType' => 'popular']) ?>
                     <?php endforeach; ?>
@@ -349,7 +383,7 @@
                         <i class="fas fa-arrow-right text-xs"></i>
                     </a>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-6">
                     <?php foreach ($featuredProducts as $product): ?>
                         <?= view('components/product_card', ['product' => $product, 'badgeType' => 'featured']) ?>
                     <?php endforeach; ?>
@@ -374,7 +408,7 @@
         </div>
 
         <?php if (!empty($allProducts)): ?>
-        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-6">
             <?php foreach ($allProducts as $product): ?>
                 <?= view('components/product_card', ['product' => $product, 'badgeType' => 'none']) ?>
             <?php endforeach; ?>

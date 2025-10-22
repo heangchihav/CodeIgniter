@@ -14,19 +14,37 @@
         .nav-link::after {
             content: '';
             position: absolute;
-            bottom: 0;
+            bottom: -1px;
             left: 50%;
             width: 0;
-            height: 2px;
-            background: white;
+            height: 3px;
+            background: linear-gradient(to right, #3b82f6, #2563eb);
             transition: all 0.3s ease;
             transform: translateX(-50%);
+            border-radius: 2px 2px 0 0;
         }
         .nav-link:hover::after {
             width: 80%;
         }
         .nav-link.active {
-            background: rgba(255, 255, 255, 0.1);
+            background: linear-gradient(to bottom, #eff6ff, #dbeafe);
+            color: #1e40af !important;
+            font-weight: 600;
+        }
+        .nav-link.active::after {
+            width: 100%;
+        }
+        .nav-link.active i {
+            color: #2563eb !important;
+        }
+        .mobile-nav-link.active {
+            background: linear-gradient(to right, #eff6ff, #dbeafe);
+            color: #1e40af !important;
+            font-weight: 600;
+            border-left: 3px solid #2563eb;
+        }
+        .mobile-nav-link.active i {
+            color: #2563eb !important;
         }
     </style>
 </head>
@@ -48,8 +66,7 @@
                             <i class="fas fa-shield-halved text-white text-lg"></i>
                         </div>
                         <div class="hidden sm:block">
-                            <span class="text-lg font-semibold text-gray-900">Admin Panel</span>
-                            <div class="text-xs text-gray-500 -mt-0.5">Management System</div>
+                            <span class="text-lg font-semibold text-gray-900">Admin</span>
                         </div>
                     </a>
                     
@@ -122,25 +139,25 @@
             <!-- Mobile menu -->
             <div id="adminMobileMenu" class="hidden md:hidden pb-3 border-t border-gray-200 mt-2">
                 <div class="space-y-1 pt-2">
-                    <a href="<?= base_url('/admin/dashboard') ?>" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
+                    <a href="<?= base_url('/admin/dashboard') ?>" class="mobile-nav-link <?= $dashboardActive ?> flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
                         <i class="fas fa-chart-line w-5 text-gray-500"></i> Dashboard
                     </a>
-                    <a href="<?= base_url('/admin/products') ?>" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
+                    <a href="<?= base_url('/admin/products') ?>" class="mobile-nav-link <?= $productsActive ?> flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
                         <i class="fas fa-box w-5 text-gray-500"></i> Products
                     </a>
-                    <a href="<?= base_url('/admin/categories') ?>" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
+                    <a href="<?= base_url('/admin/categories') ?>" class="mobile-nav-link <?= $categoriesActive ?> flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
                         <i class="fas fa-tags w-5 text-gray-500"></i> Categories
                     </a>
-                    <a href="<?= base_url('/admin/banners') ?>" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
+                    <a href="<?= base_url('/admin/banners') ?>" class="mobile-nav-link <?= $bannersActive ?> flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
                         <i class="fas fa-image w-5 text-gray-500"></i> Banners
                     </a>
-                    <a href="<?= base_url('/admin/orders') ?>" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
+                    <a href="<?= base_url('/admin/orders') ?>" class="mobile-nav-link <?= $ordersActive ?> flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
                         <i class="fas fa-shopping-cart w-5 text-gray-500"></i> Orders
                     </a>
-                    <a href="<?= base_url('/admin/customers') ?>" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
+                    <a href="<?= base_url('/admin/customers') ?>" class="mobile-nav-link <?= $customersActive ?> flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
                         <i class="fas fa-users w-5 text-gray-500"></i> Customers
                     </a>
-                    <a href="<?= base_url('/admin/payment-methods') ?>" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
+                    <a href="<?= base_url('/admin/payment-methods') ?>" class="mobile-nav-link <?= $paymentMethodsActive ?> flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
                         <i class="fas fa-credit-card w-5 text-gray-500"></i> Payment Methods
                     </a>
                     <div class="border-t border-gray-200 my-2 pt-2">

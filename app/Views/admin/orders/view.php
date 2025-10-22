@@ -131,11 +131,6 @@
                             Download
                         </a>
                     </div>
-                    
-                    <div class="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-                        <i class="fas fa-check-circle text-green-600"></i>
-                        <span class="text-sm text-green-800 font-medium">Payment slip uploaded</span>
-                    </div>
                 </div>
             <?php else: ?>
                 <div class="text-center py-8">

@@ -1,24 +1,6 @@
 <?= view('layout/header') ?>
 
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Flash Messages -->
-    <?php if (session()->getFlashdata('success')): ?>
-    <div class="mb-6 bg-green-50 border-l-4 border-green-500 text-green-800 px-4 py-3 rounded-r shadow-sm">
-        <div class="flex items-center gap-3">
-            <i class="fas fa-check-circle text-green-500"></i>
-            <p class="font-medium"><?= session()->getFlashdata('success') ?></p>
-        </div>
-    </div>
-    <?php endif; ?>
-
-    <?php if (session()->getFlashdata('error')): ?>
-    <div class="mb-6 bg-red-50 border-l-4 border-red-500 text-red-800 px-4 py-3 rounded-r shadow-sm">
-        <div class="flex items-center gap-3">
-            <i class="fas fa-exclamation-circle text-red-500"></i>
-            <p class="font-medium"><?= session()->getFlashdata('error') ?></p>
-        </div>
-    </div>
-    <?php endif; ?>
 
     <div class="mb-8">
         <div class="flex justify-between items-start">
